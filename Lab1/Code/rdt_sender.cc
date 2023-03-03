@@ -84,14 +84,14 @@ const double TimeOutValue = 0.3;
 
 // window info
 const int Moving_Window_Size = 10;
-int Moving_Window_Left_Index = 0;
-int Moving_Window_Right_Index = 0;
+unsigned int Moving_Window_Left_Index = 0;
+unsigned int Moving_Window_Right_Index = 0;
 
 // 引入已经发的包的最大的seqID，不管这个包发没有发成功
 // 这个变量是为了方便滑动窗口，当滑动窗口滑动之后，如果起点是一个全新的包，从来没有发送过，那说明窗口里面的所有内容需要重发
 // 如果没有这个变量，每次滑动窗口之后，都需把窗口里面信息全发一遍，这是没有必要浪费时间的！
 // packet already sent max id
-int Already_Send_Max_ID_Sequence = 0;
+unsigned int Already_Send_Max_ID_Sequence = 0;
 
 
 // hash func
@@ -201,10 +201,10 @@ void Sender_FromUpperLayer_GBN(struct message *msg){
     }
     
     // GBN 发前面的N个
-    for(int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index && i <rdt_sender_buffer.size(); i++){
+    for(unsigned int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index && i <rdt_sender_buffer.size(); i++){
         Sender_ToLowerLayer(&rdt_sender_buffer[i]);
         // buffer 里面的 buffer[i] 对应seqID i+1
-        Already_Send_Max_ID_Sequence = std::max(Already_Send_Max_ID_Sequence, (i + 1));
+        Already_Send_Max_ID_Sequence = std::max(Already_Send_Max_ID_Sequence, i + 1);
     }
     
     Sender_StartTimer(TimeOutValue);
@@ -236,7 +236,7 @@ void Sender_FromLowerLayer_GBN(struct packet *pkt)
         Moving_Window_Right_Index = Moving_Window_Left_Index + Moving_Window_Size - 1;
         
         if(Moving_Window_Left_Index > Already_Send_Max_ID_Sequence){
-            for(int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index; i++){
+            for(unsigned int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index; i++){
                 // 变量 i 非法，不访问直接终止循环
                 
                 if(i >= rdt_sender_buffer.size())
@@ -247,7 +247,7 @@ void Sender_FromLowerLayer_GBN(struct packet *pkt)
                     Sender_StartTimer(TimeOutValue);
 
                 Sender_ToLowerLayer(&rdt_sender_buffer[i]);
-                Already_Send_Max_ID_Sequence = std::max(Already_Send_Max_ID_Sequence, (i + 1));
+                Already_Send_Max_ID_Sequence = std::max(Already_Send_Max_ID_Sequence, (unsigned int)(i + 1));
             }
         }
     }
@@ -268,7 +268,7 @@ void Sender_Timeout_GBN()
     rdt_sender_mutex.lock();
     
     // 根据GBN规则，只要超时，全部重新发！
-    for(int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index; i++){
+    for(unsigned int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index; i++){
         // 变量 i 非法，不访问直接终止循环
         if(i >= rdt_sender_buffer.size())
             break;
