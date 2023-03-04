@@ -304,8 +304,8 @@ void Receiver_FromLowerLayer_SR(struct packet *pkt){
    receiver */
 void Receiver_FromLowerLayer(struct packet *pkt)
 {
-    Receiver_FromLowerLayer_GBN(pkt);
-    // Receiver_FromLowerLayer_SR(pkt);
+    // Receiver_FromLowerLayer_GBN(pkt);
+    Receiver_FromLowerLayer_SR(pkt);
 }
 
 

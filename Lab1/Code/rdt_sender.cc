@@ -319,7 +319,7 @@ void Sender_FromUpperLayer_SR(struct message *msg){
         for(unsigned int i = Moving_Window_Left_Index; i <= Moving_Window_Right_Index && i <rdt_sender_buffer.size(); i++){
             Sender_ToLowerLayer(&rdt_sender_buffer[i]);
             // buffer 里面的 buffer[i] 对应seqID i+1
-            printf("[init] 发送！%u \n", i + 1);
+            //printf("[init] 发送！%u \n", i + 1);
             Already_Send_Max_ID_Sequence = std::max(Already_Send_Max_ID_Sequence, i + 1);
         }
         send_start = true;
@@ -421,16 +421,16 @@ void Sender_Timeout_SR(){
    sender */
 void Sender_FromLowerLayer(struct packet *pkt)
 {
-    Sender_FromLowerLayer_GBN(pkt);
-    // Sender_FromLowerLayer_SR(pkt);
+    // Sender_FromLowerLayer_GBN(pkt);
+    Sender_FromLowerLayer_SR(pkt);
 }
 
 
 /* event handler, called when the timer expires */
 void Sender_Timeout()
 {
-    Sender_Timeout_GBN();
-    // Sender_Timeout_SR();
+    // Sender_Timeout_GBN();
+    Sender_Timeout_SR();
 }
 
 
@@ -447,7 +447,7 @@ void Sender_FromUpperLayer(struct message *msg)
     // 因为主函数产生的速度非常快，假如第一次产生的message比较小（分成一个packet），第二次产生的大（需要两个packet）
     // 需要正确的给这些packet标号！第一次产生的message比较小作为一个标号为1的packet，第二次的作为标号为2、3的packet！
 
-    Sender_FromUpperLayer_GBN(msg);
+    // Sender_FromUpperLayer_GBN(msg);
 
-    // Sender_FromUpperLayer_SR(msg);
+    Sender_FromUpperLayer_SR(msg);
 }
