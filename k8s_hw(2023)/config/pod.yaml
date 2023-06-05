@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+  labels: 
+    app: mypod
+spec:
+  containers:
+    - name: fileserver
+      image: hejingkai/fileserver:latest
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: share-volume
+          mountPath: /usr/share/files
+    - name: downloader
+      image: hejingkai/downloader:latest
+      ports:
+      - containerPort: 3000
+      volumeMounts:
+        - name: share-volume
+          mountPath: /data
+  volumes:
+    - name: share-volume
+      hostPath:
+        path: /root/mountData
+        type: DirectoryOrCreate
